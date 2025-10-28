@@ -1,9 +1,1 @@
-import './style.css';
-import tierDesignLogo from './tier-design.svg';
-
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-      <img src="${tierDesignLogo}" alt="Tier Design Logo" />
-      <h1>Tier Design</h1>
-  </div>
-`;
+import { state } from './state.ts';
