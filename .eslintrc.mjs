@@ -1,4 +1,6 @@
-module.exports = {
+// noinspection JSUnusedGlobalSymbols
+
+export default {
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint', 'prettier'],
   extends: [
