@@ -46,28 +46,66 @@ tierListTitle.addEventListener('blur', () => {
 const mainDropArea = document.getElementById('app')!;
 mainDropArea.addEventListener('drop', (e) => {
   e.preventDefault();
-  console.log(e);
 
   const target = e.target as HTMLElement;
-
   const dropZone = target.closest(
     '.ranked-items-row, .unranked-items-row'
   ) as HTMLElement | null;
-  console.log(dropZone);
   if (!dropZone) return;
+
   const itemId = Number(e.dataTransfer!.getData('text'));
-  const fromRowId = state.tiers.find((tier) =>
+  if (Number.isNaN(itemId)) return;
+
+  const sourceTierIndex = state.tiers.findIndex((tier) =>
     tier.items.some((item) => item.id === itemId)
-  )?.id;
-  const targetRowId = dropZone?.dataset.id;
-  console.log(
-    'Item Id',
-    itemId,
-    'From Row Id',
-    fromRowId,
-    'Target Row Id',
-    targetRowId
   );
+  const targetTierId = Number(dropZone?.dataset.id);
+  const targetTierIndex = state.tiers.findIndex(
+    (tier) => tier.id === targetTierId
+  );
+
+  const tierItem =
+    sourceTierIndex >= 0
+      ? state.tiers[sourceTierIndex].items.find((item) => item.id === itemId)
+      : state.unrankedItems.find((item) => item.id === itemId);
+
+  if (!tierItem) {
+    throw new Error('Tier Item unexpectedly missing');
+  }
+
+  if (sourceTierIndex >= 0) {
+    const sourceTier = state.tiers[sourceTierIndex];
+    const updatedSourceTier = {
+      ...sourceTier,
+      items: sourceTier.items.filter((item) => item.id !== itemId),
+    };
+    state.tiers = [
+      ...state.tiers.slice(0, sourceTierIndex),
+      updatedSourceTier,
+      ...state.tiers.slice(sourceTierIndex + 1),
+    ];
+  } else {
+    state.unrankedItems = state.unrankedItems.filter(
+      (item) => item.id !== itemId
+    );
+  }
+
+  if (targetTierIndex >= 0) {
+    const targetTier = state.tiers[targetTierIndex];
+    const updatedTargetTier = {
+      ...targetTier,
+      items: [...targetTier.items, tierItem],
+    };
+    state.tiers = [
+      ...state.tiers.slice(0, targetTierIndex),
+      updatedTargetTier,
+      ...state.tiers.slice(targetTierIndex + 1),
+    ];
+  } else {
+    state.unrankedItems = [...state.unrankedItems, tierItem];
+  }
+
+  render();
 });
 
 render();

@@ -62,13 +62,16 @@
 .ranked-items-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     width: 36rem;
 }
 
 .unranked-items-row {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     width: 40rem;
+    min-height: 4rem;
     background-color: #1a1a17;
 }
 
