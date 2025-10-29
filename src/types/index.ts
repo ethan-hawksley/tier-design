@@ -4,7 +4,7 @@ export interface TierItem {
 }
 
 export interface Tier {
-  name: string;
+  label: string;
   colour: string;
   items: TierItem[];
 }
