@@ -2,6 +2,7 @@ import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
 import './style.css';
+import type { Tier } from './types';
 
 const tierListTitle = document.getElementById('tier-list-title')!;
 const tierListContainer = document.getElementById('tier-list-container')!;
@@ -46,6 +47,7 @@ tierListTitle.addEventListener('blur', () => {
 const mainDropArea = document.getElementById('app')!;
 mainDropArea.addEventListener('drop', (e) => {
   e.preventDefault();
+  console.log(e);
 
   const target = e.target as HTMLElement;
   const dropZone = target.closest(
@@ -92,10 +94,41 @@ mainDropArea.addEventListener('drop', (e) => {
 
   if (targetTierIndex >= 0) {
     const targetTier = state.tiers[targetTierIndex];
-    const updatedTargetTier = {
-      ...targetTier,
-      items: [...targetTier.items, tierItem],
-    };
+    let updatedTargetTier: Tier;
+    if (target.classList.contains('draggable-item')) {
+      const targetTierItemId = Number(target.dataset.id);
+      const targetTierItemIndex = targetTier.items.findIndex(
+        (item) => item.id === targetTierItemId
+      );
+      const boundingClientRect = target.getBoundingClientRect();
+      console.log(boundingClientRect);
+      if (e.clientX < boundingClientRect.x + boundingClientRect.width / 2) {
+        console.log('left');
+        updatedTargetTier = {
+          ...targetTier,
+          items: [
+            ...targetTier.items.slice(0, targetTierItemIndex),
+            tierItem,
+            ...targetTier.items.slice(targetTierItemIndex),
+          ],
+        };
+      } else {
+        console.log('right');
+        updatedTargetTier = {
+          ...targetTier,
+          items: [
+            ...targetTier.items.slice(0, targetTierItemIndex + 1),
+            tierItem,
+            ...targetTier.items.slice(targetTierItemIndex + 1),
+          ],
+        };
+      }
+    } else {
+      updatedTargetTier = {
+        ...targetTier,
+        items: [...targetTier.items, tierItem],
+      };
+    }
     state.tiers = [
       ...state.tiers.slice(0, targetTierIndex),
       updatedTargetTier,
