@@ -19,6 +19,10 @@ export default function createTierRow(
 
   const rankedItemsRow = document.createElement('div');
   rankedItemsRow.classList.add('ranked-items-row');
+  rankedItemsRow.dataset.id = tier.id;
+  rankedItemsRow.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
   for (const tierItem of tier.items) {
     const draggableItem = createDraggableItem(tierItem);
     rankedItemsRow.append(draggableItem);

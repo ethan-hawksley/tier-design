@@ -43,4 +43,15 @@ tierListTitle.addEventListener('blur', () => {
   render();
 });
 
+const mainDropArea = document.getElementById('app')!;
+mainDropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  console.log(e);
+
+  const target = e.target as HTMLElement;
+
+  const dropZone = target.closest('.ranked-items-row, #unranked-items-row');
+  if (!dropZone) return;
+  console.log(dropZone);
+});
 render();

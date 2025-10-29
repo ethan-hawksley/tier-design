@@ -1,9 +1,10 @@
 export interface TierItem {
-  id: number;
+  id: string;
   content: string;
 }
 
 export interface Tier {
+  id: string;
   label: string;
   colour: string;
   items: TierItem[];
