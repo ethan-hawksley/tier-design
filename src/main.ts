@@ -50,8 +50,24 @@ mainDropArea.addEventListener('drop', (e) => {
 
   const target = e.target as HTMLElement;
 
-  const dropZone = target.closest('.ranked-items-row, #unranked-items-row');
-  if (!dropZone) return;
+  const dropZone = target.closest(
+    '.ranked-items-row, .unranked-items-row'
+  ) as HTMLElement | null;
   console.log(dropZone);
+  if (!dropZone) return;
+  const itemId = Number(e.dataTransfer!.getData('text'));
+  const fromRowId = state.tiers.find((tier) =>
+    tier.items.some((item) => item.id === itemId)
+  )?.id;
+  const targetRowId = dropZone?.dataset.id;
+  console.log(
+    'Item Id',
+    itemId,
+    'From Row Id',
+    fromRowId,
+    'Target Row Id',
+    targetRowId
+  );
 });
+
 render();

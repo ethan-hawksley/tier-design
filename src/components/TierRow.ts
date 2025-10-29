@@ -19,7 +19,7 @@ export default function createTierRow(
 
   const rankedItemsRow = document.createElement('div');
   rankedItemsRow.classList.add('ranked-items-row');
-  rankedItemsRow.dataset.id = tier.id;
+  rankedItemsRow.dataset.id = tier.id.toString();
   rankedItemsRow.addEventListener('dragover', (e) => {
     e.preventDefault();
   });

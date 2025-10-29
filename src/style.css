@@ -62,6 +62,7 @@
 .ranked-items-row {
     display: flex;
     flex-direction: row;
+    width: 36rem;
 }
 
 .unranked-items-row {
