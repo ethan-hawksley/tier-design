@@ -5,6 +5,7 @@ export default function createDraggableItem(tierItem: TierItem) {
   draggableItem.classList.add('draggable-item');
   draggableItem.draggable = true;
   draggableItem.textContent = tierItem.content;
+  tierItem.id;
 
   return draggableItem;
 }

@@ -3,8 +3,16 @@ import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
 import './style.css';
 
+const tierListTitle = document.getElementById('tier-list-title')!;
+const tierListContainer = document.getElementById('tier-list-container')!;
+const unrankedItemsContainer = document.getElementById(
+  'unranked-items-container'
+)!;
+
 function render() {
   console.log('Rendering Tier List');
+  tierListTitle.textContent = state.title;
+
   const tierRowsFrag = document.createDocumentFragment();
   for (let i = 0; i < state.tiers.length; i++) {
     const tier = state.tiers[i];
@@ -18,12 +26,21 @@ function render() {
     });
     tierRowsFrag.append(tierRow);
   }
-  document.getElementById('tier-rows')!.replaceChildren(tierRowsFrag);
+  tierListContainer.replaceChildren(tierRowsFrag);
 
   const unrankedItemsRow = createUnrankedItemsRow(state.unrankedItems);
-  document
-    .getElementById('unranked-item-row')!
-    .replaceChildren(unrankedItemsRow);
+  unrankedItemsContainer.replaceChildren(unrankedItemsRow);
 }
+
+tierListTitle.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+  }
+});
+
+tierListTitle.addEventListener('blur', () => {
+  state.title = tierListTitle.textContent;
+  render();
+});
 
 render();

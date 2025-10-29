@@ -13,12 +13,33 @@
     'Segoe UI Symbol',
     'Noto Color Emoji';
 
+    background-color: #242222;
+    color: #fff;
+    box-sizing: border-box;
+
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
 
-    box-sizing: border-box;
+#tier-list {
+    background-color: #1a1a17;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+#tier-list-title {
+    color: #fff;
+    width: 40rem;
+    text-align: center;
+    font-size: 3rem;
+    word-break: break-word;
+    background: none;
+    border: none;
 }
 
 .tier-row {
@@ -26,12 +47,11 @@
     flex-direction: row;
     width: 40rem;
     min-height: 4rem;
-    background-color: #1a1a17;
 }
 
 .tier-label {
     width: 4rem;
-    color: white;
+    border: none;
 
     display: flex;
     align-items: center;
@@ -42,13 +62,13 @@
 .ranked-items-row {
     display: flex;
     flex-direction: row;
-    color: white;
 }
 
 .unranked-items-row {
     display: flex;
     flex-direction: row;
-    color: white;
+    width: 40rem;
+    background-color: #1a1a17;
 }
 
 .draggable-item {

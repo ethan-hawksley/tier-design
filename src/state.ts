@@ -1,11 +1,13 @@
 import type { Tier, TierItem } from './types';
 
 interface AppState {
+  title: string;
   tiers: Tier[];
   unrankedItems: TierItem[];
 }
 
 export const state: AppState = {
+  title: 'Tier List Title',
   tiers: [
     {
       label: 'S',
