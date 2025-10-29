@@ -7,5 +7,5 @@ interface AppState {
 
 export const state: AppState = {
   tiers: [{ name: 'S', colour: '#ff7f80', items: [] }],
-  unrankedItems: [],
+  unrankedItems: [{ id: 0, content: 'Item A' }],
 };

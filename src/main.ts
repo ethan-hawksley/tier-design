@@ -1,14 +1,20 @@
 import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
+import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
+import './style.css';
 
 function render() {
-  const frag = document.createDocumentFragment();
+  const tierRowsFrag = document.createDocumentFragment();
   for (const tier of state.tiers) {
     const tierRow = createTierRow(tier);
-    frag.append(tierRow);
+    tierRowsFrag.append(tierRow);
   }
+  document.getElementById('tier-rows')!.replaceChildren(tierRowsFrag);
 
-  document.getElementById('tier-rows')!.replaceChildren(frag);
+  const unrankedItemsRow = createUnrankedItemsRow(state.unrankedItems);
+  document
+    .getElementById('unranked-item-row')!
+    .replaceChildren(unrankedItemsRow);
 }
 
 render();

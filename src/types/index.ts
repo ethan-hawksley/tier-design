@@ -1,5 +1,5 @@
 export interface TierItem {
-  id: string;
+  id: number;
   content: string;
 }
 
