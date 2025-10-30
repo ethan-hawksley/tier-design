@@ -9,6 +9,7 @@ export default function createDraggableItem(
   draggableItem.draggable = true;
   if ('text' in tierItem) {
     draggableItem.textContent = tierItem.text;
+    draggableItem.classList.add('draggable-item-text');
   }
   draggableItem.dataset.id = tierItem.id.toString();
   draggableItem.addEventListener('dragstart', (e) => {
