@@ -12,15 +12,20 @@
     'Segoe UI Emoji',
     'Segoe UI Symbol',
     'Noto Color Emoji';
-
     background-color: #242222;
     color: #fff;
     box-sizing: border-box;
-
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #tier-list {
@@ -52,7 +57,6 @@
 .tier-label {
     width: 4rem;
     border: none;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,9 +83,17 @@
     width: 4rem;
     height: 4rem;
     color: white;
-
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    cursor: grab;
+}
+
+.tier-list-button {
+    color: #fff;
+    background-color: #1a1a17;
+    border: 3px solid #000000;
+    border-radius: 15vh;
+    font-size: 1.5rem;
 }
