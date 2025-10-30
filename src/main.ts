@@ -187,8 +187,23 @@ mainDropArea.addEventListener('drop', (e) => {
   render();
 });
 
+function getMaxIdOfArray(array: TierItem[]) {
+  return array.reduce(
+    (currentMaxID, item) => Math.max(item.id, currentMaxID),
+    -Infinity
+  );
+}
+
 function generateNextItemId() {
-  return 3;
+  return (
+    Math.max(
+      state.tiers.reduce(
+        (currentMax, tier) => Math.max(getMaxIdOfArray(tier.items), currentMax),
+        -Infinity
+      ),
+      getMaxIdOfArray(state.unrankedItems)
+    ) + 1
+  );
 }
 
 addTextButton.addEventListener('click', () => {
@@ -200,6 +215,7 @@ addTextButton.addEventListener('click', () => {
       text: text,
     };
     state.unrankedItems = [...state.unrankedItems, newItem];
+    render();
   }
 });
 
@@ -213,6 +229,7 @@ addImagesButton.addEventListener('click', () => {
       text: text,
     };
     state.unrankedItems = [...state.unrankedItems, newItem];
+    render();
   }
 });
 
