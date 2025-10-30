@@ -29,7 +29,13 @@ function render() {
   }
   tierListContainer.replaceChildren(tierRowsFrag);
 
-  const unrankedItemsRow = createUnrankedItemsRow(state.unrankedItems);
+  const unrankedItemsRow = createUnrankedItemsRow(
+    state.unrankedItems,
+    (updatedUnrankedItems) => {
+      state.unrankedItems = updatedUnrankedItems;
+      render();
+    }
+  );
   unrankedItemsContainer.replaceChildren(unrankedItemsRow);
 }
 

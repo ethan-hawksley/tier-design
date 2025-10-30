@@ -23,8 +23,16 @@ export default function createTierRow(
   rankedItemsRow.addEventListener('dragover', (e) => {
     e.preventDefault();
   });
-  for (const tierItem of tier.items) {
-    const draggableItem = createDraggableItem(tierItem);
+
+  for (let i = 0; i < tier.items.length; i++) {
+    const tierItem = tier.items[i];
+    const draggableItem = createDraggableItem(tierItem, () => {
+      const updatedTier: Tier = {
+        ...tier,
+        items: tier.items.filter((item) => item.id !== tierItem.id),
+      };
+      onUpdate(updatedTier);
+    });
     rankedItemsRow.append(draggableItem);
   }
 
