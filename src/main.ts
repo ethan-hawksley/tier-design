@@ -146,7 +146,28 @@ mainDropArea.addEventListener('drop', (e) => {
       ...state.tiers.slice(targetTierIndex + 1),
     ];
   } else {
-    state.unrankedItems = [...state.unrankedItems, tierItem];
+    if (closestDraggableItem?.classList.contains('draggable-item')) {
+      const targetItemId = Number(closestDraggableItem.dataset.id);
+      const targetItemIndex = state.unrankedItems.findIndex(
+        (item) => item.id === targetItemId
+      );
+      const boundingClientRect = closestDraggableItem.getBoundingClientRect();
+      if (e.clientX < boundingClientRect.x + boundingClientRect.width / 2) {
+        state.unrankedItems = [
+          ...state.unrankedItems.slice(0, targetItemIndex),
+          tierItem,
+          ...state.unrankedItems.slice(targetItemIndex),
+        ];
+      } else {
+        state.unrankedItems = [
+          ...state.unrankedItems.slice(0, targetItemIndex + 1),
+          tierItem,
+          ...state.unrankedItems.slice(targetItemIndex + 1),
+        ];
+      }
+    } else {
+      state.unrankedItems = [...state.unrankedItems, tierItem];
+    }
   }
 
   render();
