@@ -75,6 +75,15 @@ mainDropArea.addEventListener('drop', (e) => {
     throw new Error('Tier Item unexpectedly missing');
   }
 
+  const closestDraggableItem = target.closest(
+    '.draggable-item'
+  ) as HTMLElement | null;
+  if (closestDraggableItem?.classList.contains('draggable-item')) {
+    if (Number(closestDraggableItem?.dataset.id) === itemId) {
+      return;
+    }
+  }
+
   if (sourceTierIndex >= 0) {
     const sourceTier = state.tiers[sourceTierIndex];
     const updatedSourceTier = {
@@ -95,15 +104,17 @@ mainDropArea.addEventListener('drop', (e) => {
   if (targetTierIndex >= 0) {
     const targetTier = state.tiers[targetTierIndex];
     let updatedTargetTier: Tier;
-    if (target.classList.contains('draggable-item')) {
-      const targetTierItemId = Number(target.dataset.id);
+    if (closestDraggableItem?.classList.contains('draggable-item')) {
+      console.log(closestDraggableItem);
+      const targetTierItemId = Number(closestDraggableItem.dataset.id);
+      console.log(targetTierItemId);
       const targetTierItemIndex = targetTier.items.findIndex(
         (item) => item.id === targetTierItemId
       );
-      const boundingClientRect = target.getBoundingClientRect();
+      const boundingClientRect = closestDraggableItem.getBoundingClientRect();
       console.log(boundingClientRect);
       if (e.clientX < boundingClientRect.x + boundingClientRect.width / 2) {
-        console.log('left');
+        console.log('left', targetTierItemIndex);
         updatedTargetTier = {
           ...targetTier,
           items: [
@@ -113,7 +124,7 @@ mainDropArea.addEventListener('drop', (e) => {
           ],
         };
       } else {
-        console.log('right');
+        console.log('right', targetTierItemIndex);
         updatedTargetTier = {
           ...targetTier,
           items: [

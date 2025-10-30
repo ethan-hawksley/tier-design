@@ -5,6 +5,7 @@ export default function createDraggableItem(tierItem: TierItem) {
   draggableItem.classList.add('draggable-item');
   draggableItem.draggable = true;
   draggableItem.textContent = tierItem.content;
+  draggableItem.dataset.id = tierItem.id.toString();
   draggableItem.addEventListener('dragstart', (e) => {
     e.dataTransfer!.setData('text', tierItem.id.toString());
   });
