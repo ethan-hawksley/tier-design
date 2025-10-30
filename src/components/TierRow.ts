@@ -3,7 +3,8 @@ import createDraggableItem from './DraggableItem.ts';
 
 export default function createTierRow(
   tier: Tier,
-  onUpdate: (updatedTier: Tier) => void
+  onUpdate: (updatedTier: Tier) => void,
+  onRemove: () => void
 ) {
   const tierRow = document.createElement('div');
   tierRow.classList.add('tier-row');
@@ -15,6 +16,10 @@ export default function createTierRow(
   tierLabel.addEventListener('change', () => {
     const updatedTier: Tier = { ...tier, label: tierLabel.value };
     onUpdate(updatedTier);
+  });
+  tierLabel.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    onRemove();
   });
 
   const rankedItemsRow = document.createElement('div');

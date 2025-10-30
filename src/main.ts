@@ -37,10 +37,18 @@ function render() {
   const tierRowsFrag = document.createDocumentFragment();
   for (let i = 0; i < state.tiers.length; i++) {
     const tier = state.tiers[i];
-    const tierRow = createTierRow(tier, (updatedTier) => {
-      state.tiers = replaceAtPosition(state.tiers, updatedTier, i);
-      render();
-    });
+    const tierRow = createTierRow(
+      tier,
+      (updatedTier) => {
+        state.tiers = replaceAtPosition(state.tiers, updatedTier, i);
+        render();
+      },
+      () => {
+        console.log('removing');
+        state.tiers = removeAtPosition(state.tiers, i);
+        render();
+      }
+    );
     tierRowsFrag.append(tierRow);
   }
   tierListContainer.replaceChildren(tierRowsFrag);
