@@ -2,7 +2,7 @@ import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
 import './style.css';
-import type { Tier, TierItem } from './types';
+import type { TierItem } from './types';
 
 function $(selector: string) {
   const element = document.querySelector(selector) as HTMLElement;
@@ -10,6 +10,18 @@ function $(selector: string) {
     throw new Error('Element cannot be found');
   }
   return element;
+}
+
+function insertAtPosition<T>(arr: T[], item: T, index: number): T[] {
+  return [...arr.slice(0, index), item, ...arr.slice(index)];
+}
+
+function replaceAtPosition<T>(arr: T[], item: T, index: number): T[] {
+  return [...arr.slice(0, index), item, ...arr.slice(index + 1)];
+}
+
+function removeAtPosition<T>(arr: T[], index: number): T[] {
+  return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
 
 const tierListTitle = $('#tier-list-title');
@@ -26,11 +38,7 @@ function render() {
   for (let i = 0; i < state.tiers.length; i++) {
     const tier = state.tiers[i];
     const tierRow = createTierRow(tier, (updatedTier) => {
-      state.tiers = [
-        ...state.tiers.slice(0, i),
-        updatedTier,
-        ...state.tiers.slice(i + 1),
-      ];
+      state.tiers = replaceAtPosition(state.tiers, updatedTier, i);
       render();
     });
     tierRowsFrag.append(tierRow);
@@ -61,7 +69,6 @@ tierListTitle.addEventListener('blur', () => {
 const mainDropArea = document.getElementById('app')!;
 mainDropArea.addEventListener('drop', (e) => {
   e.preventDefault();
-  console.log(e);
 
   const target = e.target as HTMLElement;
   const dropZone = target.closest(
@@ -104,11 +111,11 @@ mainDropArea.addEventListener('drop', (e) => {
       ...sourceTier,
       items: sourceTier.items.filter((item) => item.id !== itemId),
     };
-    state.tiers = [
-      ...state.tiers.slice(0, sourceTierIndex),
+    state.tiers = replaceAtPosition(
+      state.tiers,
       updatedSourceTier,
-      ...state.tiers.slice(sourceTierIndex + 1),
-    ];
+      sourceTierIndex
+    );
   } else {
     state.unrankedItems = state.unrankedItems.filter(
       (item) => item.id !== itemId
@@ -117,48 +124,40 @@ mainDropArea.addEventListener('drop', (e) => {
 
   if (targetTierIndex >= 0) {
     const targetTier = state.tiers[targetTierIndex];
-    let updatedTargetTier: Tier;
+    let updatedTargetTierItems: TierItem[];
     if (closestDraggableItem?.classList.contains('draggable-item')) {
-      console.log(closestDraggableItem);
       const targetTierItemId = Number(closestDraggableItem.dataset.id);
-      console.log(targetTierItemId);
       const targetTierItemIndex = targetTier.items.findIndex(
         (item) => item.id === targetTierItemId
       );
       const boundingClientRect = closestDraggableItem.getBoundingClientRect();
-      console.log(boundingClientRect);
-      if (e.clientX < boundingClientRect.x + boundingClientRect.width / 2) {
-        console.log('left', targetTierItemIndex);
-        updatedTargetTier = {
-          ...targetTier,
-          items: [
-            ...targetTier.items.slice(0, targetTierItemIndex),
-            tierItem,
-            ...targetTier.items.slice(targetTierItemIndex),
-          ],
-        };
+      const isLeftSide =
+        e.clientX < boundingClientRect.x + boundingClientRect.width / 2;
+      if (isLeftSide) {
+        updatedTargetTierItems = insertAtPosition(
+          targetTier.items,
+          tierItem,
+          targetTierItemIndex
+        );
       } else {
-        console.log('right', targetTierItemIndex);
-        updatedTargetTier = {
-          ...targetTier,
-          items: [
-            ...targetTier.items.slice(0, targetTierItemIndex + 1),
-            tierItem,
-            ...targetTier.items.slice(targetTierItemIndex + 1),
-          ],
-        };
+        updatedTargetTierItems = insertAtPosition(
+          targetTier.items,
+          tierItem,
+          targetTierItemIndex + 1
+        );
       }
     } else {
-      updatedTargetTier = {
-        ...targetTier,
-        items: [...targetTier.items, tierItem],
-      };
+      updatedTargetTierItems = [...targetTier.items, tierItem];
     }
-    state.tiers = [
-      ...state.tiers.slice(0, targetTierIndex),
+    const updatedTargetTier = {
+      ...targetTier,
+      items: updatedTargetTierItems,
+    };
+    state.tiers = replaceAtPosition(
+      state.tiers,
       updatedTargetTier,
-      ...state.tiers.slice(targetTierIndex + 1),
-    ];
+      targetTierIndex
+    );
   } else {
     if (closestDraggableItem?.classList.contains('draggable-item')) {
       const targetItemId = Number(closestDraggableItem.dataset.id);
@@ -166,18 +165,20 @@ mainDropArea.addEventListener('drop', (e) => {
         (item) => item.id === targetItemId
       );
       const boundingClientRect = closestDraggableItem.getBoundingClientRect();
-      if (e.clientX < boundingClientRect.x + boundingClientRect.width / 2) {
-        state.unrankedItems = [
-          ...state.unrankedItems.slice(0, targetItemIndex),
+      const isLeftSide =
+        e.clientX < boundingClientRect.x + boundingClientRect.width / 2;
+      if (isLeftSide) {
+        state.unrankedItems = insertAtPosition(
+          state.unrankedItems,
           tierItem,
-          ...state.unrankedItems.slice(targetItemIndex),
-        ];
+          targetItemIndex
+        );
       } else {
-        state.unrankedItems = [
-          ...state.unrankedItems.slice(0, targetItemIndex + 1),
+        state.unrankedItems = insertAtPosition(
+          state.unrankedItems,
           tierItem,
-          ...state.unrankedItems.slice(targetItemIndex + 1),
-        ];
+          targetItemIndex + 1
+        );
       }
     } else {
       state.unrankedItems = [...state.unrankedItems, tierItem];
@@ -187,30 +188,24 @@ mainDropArea.addEventListener('drop', (e) => {
   render();
 });
 
-function getMaxIdOfArray(array: TierItem[]) {
-  return array.reduce(
-    (currentMaxID, item) => Math.max(item.id, currentMaxID),
-    -Infinity
-  );
+function getMaxId(items: TierItem[]) {
+  return items.reduce((maxId, item) => Math.max(item.id, maxId), -Infinity);
 }
 
-function generateNextItemId() {
-  return (
-    Math.max(
-      state.tiers.reduce(
-        (currentMax, tier) => Math.max(getMaxIdOfArray(tier.items), currentMax),
-        -Infinity
-      ),
-      getMaxIdOfArray(state.unrankedItems)
-    ) + 1
+function getNextItemId() {
+  const maxIdInTiers = state.tiers.reduce(
+    (currentMax, tier) => Math.max(getMaxId(tier.items), currentMax),
+    -Infinity
   );
+  const maxIdInUnranked = getMaxId(state.unrankedItems);
+  return Math.max(maxIdInTiers, maxIdInUnranked) + 1;
 }
 
 addTextButton.addEventListener('click', () => {
   const text = prompt('Enter text:');
   if (text) {
     const newItem: TierItem = {
-      id: generateNextItemId(),
+      id: getNextItemId(),
       type: 'text',
       text: text,
     };
@@ -224,7 +219,7 @@ addImagesButton.addEventListener('click', () => {
   const text = prompt('Enter text:');
   if (text) {
     const newItem: TierItem = {
-      id: generateNextItemId(),
+      id: getNextItemId(),
       type: 'text',
       text: text,
     };
