@@ -2,7 +2,7 @@ import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
 import './style.css';
-import type { TierItem } from './types';
+import type { Tier, TierItem } from './types';
 
 function $(selector: string) {
   const element = document.querySelector(selector) as HTMLElement;
@@ -29,6 +29,7 @@ const tierListContainer = $('#tier-list-container');
 const unrankedItemsContainer = $('#unranked-items-container');
 const addTextButton = $('#add-text-button');
 const addImagesButton = $('#add-images-button');
+const addTierButton = $('#add-tier-button');
 
 function render() {
   console.log('Rendering Tier List');
@@ -203,7 +204,7 @@ function getMaxId(items: TierItem[]) {
 function getNextItemId() {
   const maxIdInTiers = state.tiers.reduce(
     (currentMax, tier) => Math.max(getMaxId(tier.items), currentMax),
-    -Infinity
+    0
   );
   const maxIdInUnranked = getMaxId(state.unrankedItems);
   return Math.max(maxIdInTiers, maxIdInUnranked) + 1;
@@ -234,6 +235,28 @@ addImagesButton.addEventListener('click', () => {
     state.unrankedItems = [...state.unrankedItems, newItem];
     render();
   }
+});
+
+function getNextTierId() {
+  return state.tiers.reduce(
+    (currentMax, tier) => Math.max(currentMax, tier.id),
+    0
+  );
+}
+
+addTierButton.addEventListener('click', () => {
+  const label = prompt('Enter label:');
+  if (!label) return;
+  const colour = prompt('Enter colour code:');
+  if (!colour) return;
+  const newTier: Tier = {
+    id: getNextTierId(),
+    label,
+    colour,
+    items: [],
+  };
+  state.tiers = [...state.tiers, newTier];
+  render();
 });
 
 render();
