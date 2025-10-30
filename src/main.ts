@@ -2,13 +2,21 @@ import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
 import './style.css';
-import type { Tier } from './types';
+import type { Tier, TierItem } from './types';
 
-const tierListTitle = document.getElementById('tier-list-title')!;
-const tierListContainer = document.getElementById('tier-list-container')!;
-const unrankedItemsContainer = document.getElementById(
-  'unranked-items-container'
-)!;
+function $(selector: string) {
+  const element = document.querySelector(selector) as HTMLElement;
+  if (!element) {
+    throw new Error('Element cannot be found');
+  }
+  return element;
+}
+
+const tierListTitle = $('#tier-list-title');
+const tierListContainer = $('#tier-list-container');
+const unrankedItemsContainer = $('#unranked-items-container');
+const addTextButton = $('#add-text-button');
+const addImagesButton = $('#add-images-button');
 
 function render() {
   console.log('Rendering Tier List');
@@ -177,6 +185,35 @@ mainDropArea.addEventListener('drop', (e) => {
   }
 
   render();
+});
+
+function generateNextItemId() {
+  return 3;
+}
+
+addTextButton.addEventListener('click', () => {
+  const text = prompt('Enter text:');
+  if (text) {
+    const newItem: TierItem = {
+      id: generateNextItemId(),
+      type: 'text',
+      text: text,
+    };
+    state.unrankedItems = [...state.unrankedItems, newItem];
+  }
+});
+
+// TODO: Implement image uploading
+addImagesButton.addEventListener('click', () => {
+  const text = prompt('Enter text:');
+  if (text) {
+    const newItem: TierItem = {
+      id: generateNextItemId(),
+      type: 'text',
+      text: text,
+    };
+    state.unrankedItems = [...state.unrankedItems, newItem];
+  }
 });
 
 render();

@@ -7,7 +7,9 @@ export default function createDraggableItem(
   const draggableItem = document.createElement('div');
   draggableItem.classList.add('draggable-item');
   draggableItem.draggable = true;
-  draggableItem.textContent = tierItem.content;
+  if ('text' in tierItem) {
+    draggableItem.textContent = tierItem.text;
+  }
   draggableItem.dataset.id = tierItem.id.toString();
   draggableItem.addEventListener('dragstart', (e) => {
     e.dataTransfer!.setData('text', tierItem.id.toString());
