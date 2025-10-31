@@ -1,4 +1,4 @@
-import { toBlob } from 'html-to-image';
+import html2canvas from 'html2canvas';
 import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
@@ -225,19 +225,6 @@ function getNextItemId() {
   return Math.max(maxIdInTiers, maxIdInUnranked) + 1;
 }
 
-// Helper to convert a Blob to a data URL (used only when rendering to blob)
-async function blobToDataUrl(blob: Blob): Promise<string> {
-  return await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => {
-      reader.abort();
-      reject(new Error('Failed to read blob as data URL'));
-    };
-    reader.onload = () => resolve(reader.result as string);
-    reader.readAsDataURL(blob);
-  });
-}
-
 addTextButton.addEventListener('click', () => {
   const text = prompt('Enter text:');
   if (text) {
@@ -303,64 +290,27 @@ function safeFileName(name: string) {
   return name;
 }
 
-// Convert all `blob:` image sources under `root` to data URLs, return a map for restoration.
-async function convertBlobImagesToDataUrls(root: HTMLElement) {
-  const images = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
-  const originalMap = new Map<HTMLImageElement, string>();
-
-  // Convert each blob: src to a data URL concurrently
-  await Promise.all(
-    images.map(async (img) => {
-      const src = img.src;
-      if (src.startsWith('blob:')) {
-        originalMap.set(img, src);
-        try {
-          const res = await fetch(src);
-          const blob = await res.blob();
-          img.src = await blobToDataUrl(blob);
-        } catch (err) {
-          // If conversion fails, keep the original src and log — we will still attempt to render.
-          console.error(
-            'Failed to convert blob URL to data URL for html-to-image:',
-            err
-          );
-        }
-      }
-    })
-  );
-
-  return originalMap;
-}
-
-// Restore original `blob:` sources from the map
-function restoreImagesSources(originalMap: Map<HTMLImageElement, string>) {
-  for (const [img, src] of originalMap.entries()) {
-    img.src = src;
-  }
-}
-
 async function renderTierListToBlob() {
   const isTitleFocused = document.activeElement === tierListTitle;
   if (isTitleFocused) {
     tierListTitle.blur();
   }
 
-  const backgroundColour = getComputedStyle(tierListElement).backgroundColor;
+  const canvas = await html2canvas(tierListElement, {
+    // backgroundColor: getComputedStyle(tierListElement).backgroundColor,
+    // useCORS: true,
+    // allowTaint: true,
+  });
 
-  // Convert `blob:` images to data URLs temporarily to avoid html-to-image fetching `blob:` URLs
-  const originalMap = await convertBlobImagesToDataUrls(tierListElement);
-
-  try {
-    const blob = await toBlob(tierListElement, {
-      backgroundColor: backgroundColour,
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error('Failed to render tier list as blob'));
+      }
     });
-
-    if (!blob) throw new Error('Failed to render tier list as blob');
-    return blob;
-  } finally {
-    // Always restore the original `blob:` sources for UI
-    restoreImagesSources(originalMap);
-  }
+  });
 }
 
 saveButton.addEventListener('click', async () => {

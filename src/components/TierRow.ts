@@ -9,12 +9,13 @@ export default function createTierRow(
   const tierRow = document.createElement('div');
   tierRow.classList.add('tier-row');
 
-  const tierLabel = document.createElement('input');
+  const tierLabel = document.createElement('div');
   tierLabel.classList.add('tier-label');
   tierLabel.style.backgroundColor = tier.colour;
-  tierLabel.value = tier.label;
-  tierLabel.addEventListener('change', () => {
-    const updatedTier: Tier = { ...tier, label: tierLabel.value };
+  tierLabel.textContent = tier.label;
+  tierLabel.contentEditable = 'true';
+  tierLabel.addEventListener('blur', () => {
+    const updatedTier: Tier = { ...tier, label: tierLabel.textContent };
     onUpdate(updatedTier);
   });
   tierLabel.addEventListener('contextmenu', (e) => {

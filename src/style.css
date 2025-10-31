@@ -93,12 +93,12 @@ img {
 .tier-label {
   width: 4rem;
 
-  border: none;
-
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
+
+  color: #000;
 }
 
 .ranked-items-row {
