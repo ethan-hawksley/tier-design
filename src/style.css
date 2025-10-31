@@ -134,11 +134,13 @@ img {
 
   color: #fff;
 
-  background-color: #111;
-
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.draggable-item > img {
+  max-height: 100%;
 }
 
 .tier-list-button {
