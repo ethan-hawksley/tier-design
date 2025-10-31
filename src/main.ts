@@ -53,8 +53,9 @@ function render() {
         render();
       },
       () => {
+        // Only revoke object URLs (`blob:`) — don't touch data URLs
         for (const item of tier.items) {
-          if ('src' in item) {
+          if ('src' in item && item.src.startsWith('blob:')) {
             URL.revokeObjectURL(item.src);
           }
         }
@@ -77,7 +78,7 @@ function render() {
 }
 
 tierListTitle.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
+  if ((e as KeyboardEvent).key === 'Enter') {
     e.preventDefault();
   }
 });
@@ -97,7 +98,7 @@ mainDropArea.addEventListener('drop', (e) => {
   ) as HTMLElement | null;
   if (!dropZone) return;
 
-  const itemId = Number(e.dataTransfer!.getData('text'));
+  const itemId = Number((e as DragEvent).dataTransfer!.getData('text'));
   if (Number.isNaN(itemId)) return;
 
   const sourceTierIndex = state.tiers.findIndex((tier) =>
@@ -153,7 +154,8 @@ mainDropArea.addEventListener('drop', (e) => {
       );
       const boundingClientRect = closestDraggableItem.getBoundingClientRect();
       const isLeftSide =
-        e.clientX < boundingClientRect.x + boundingClientRect.width / 2;
+        (e as DragEvent).clientX <
+        boundingClientRect.x + boundingClientRect.width / 2;
       if (isLeftSide) {
         updatedTargetTierItems = insertAtPosition(
           targetTier.items,
@@ -187,7 +189,8 @@ mainDropArea.addEventListener('drop', (e) => {
       );
       const boundingClientRect = closestDraggableItem.getBoundingClientRect();
       const isLeftSide =
-        e.clientX < boundingClientRect.x + boundingClientRect.width / 2;
+        (e as DragEvent).clientX <
+        boundingClientRect.x + boundingClientRect.width / 2;
       if (isLeftSide) {
         state.unrankedItems = insertAtPosition(
           state.unrankedItems,
@@ -222,15 +225,16 @@ function getNextItemId() {
   return Math.max(maxIdInTiers, maxIdInUnranked) + 1;
 }
 
-async function fileToDataUrl(file: File): Promise<string> {
+// Helper to convert a Blob to a data URL (used only when rendering to blob)
+async function blobToDataUrl(blob: Blob): Promise<string> {
   return await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onerror = () => {
       reader.abort();
-      reject(new Error('Failed to read file as data URL'));
+      reject(new Error('Failed to read blob as data URL'));
     };
     reader.onload = () => resolve(reader.result as string);
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(blob);
   });
 }
 
@@ -251,16 +255,17 @@ addImagesButton.addEventListener('click', () => {
   imagesInput.click();
 });
 
+// Use object URLs for UI performance (lightweight). We'll only convert when rendering to blob.
 imagesInput.addEventListener('change', async () => {
   if (!imagesInput.files) return;
 
   for (const file of imagesInput.files) {
     try {
-      const dataUrl = await fileToDataUrl(file);
+      const objectUrl = URL.createObjectURL(file);
       const tierItem: TierItem = {
         id: getNextItemId(),
         type: 'image',
-        src: dataUrl,
+        src: objectUrl,
       };
       state.unrankedItems = addToArray(state.unrankedItems, tierItem);
     } catch (e) {
@@ -298,6 +303,42 @@ function safeFileName(name: string) {
   return name;
 }
 
+// Convert all `blob:` image srcs under `root` to data URLs, return a map for restoration.
+async function convertBlobImagesToDataUrls(root: HTMLElement) {
+  const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+  const originalMap = new Map<HTMLImageElement, string>();
+
+  // Convert each blob: src to a data URL concurrently
+  await Promise.all(
+    imgs.map(async (img) => {
+      const src = img.src;
+      if (src.startsWith('blob:')) {
+        originalMap.set(img, src);
+        try {
+          const res = await fetch(src);
+          const blob = await res.blob();
+          img.src = await blobToDataUrl(blob);
+        } catch (err) {
+          // If conversion fails, keep the original src and log — we will still attempt to render.
+          console.error(
+            'Failed to convert blob URL to data URL for html-to-image:',
+            err
+          );
+        }
+      }
+    })
+  );
+
+  return originalMap;
+}
+
+// Restore original `blob:` srcs from the map
+function restoreImageSrcs(originalMap: Map<HTMLImageElement, string>) {
+  for (const [img, src] of originalMap.entries()) {
+    img.src = src;
+  }
+}
+
 async function renderTierListToBlob() {
   const isTitleFocused = document.activeElement === tierListTitle;
   if (isTitleFocused) {
@@ -306,16 +347,24 @@ async function renderTierListToBlob() {
 
   const backgroundColour = getComputedStyle(tierListElement).backgroundColor;
 
-  const blob = await toBlob(tierListElement, {
-    backgroundColor: backgroundColour,
-    cacheBust: true,
-    pixelRatio: 2,
-    width: tierListElement.scrollWidth,
-    height: tierListElement.scrollHeight,
-  });
+  // Convert `blob:` images to data URLs temporarily to avoid html-to-image fetching `blob:` URLs
+  const originalMap = await convertBlobImagesToDataUrls(tierListElement);
 
-  if (!blob) throw new Error('Failed to render tier list as blob');
-  return blob;
+  try {
+    const blob = await toBlob(tierListElement, {
+      backgroundColor: backgroundColour,
+      cacheBust: true,
+      pixelRatio: 2,
+      width: tierListElement.scrollWidth,
+      height: tierListElement.scrollHeight,
+    });
+
+    if (!blob) throw new Error('Failed to render tier list as blob');
+    return blob;
+  } finally {
+    // Always restore the original `blob:` srcs for UI
+    restoreImageSrcs(originalMap);
+  }
 }
 
 saveButton.addEventListener('click', async () => {
@@ -324,7 +373,7 @@ saveButton.addEventListener('click', async () => {
     const blobUrl = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = safeFileName(tierListTitle.textContent);
+    link.download = safeFileName(tierListTitle.textContent || 'tier-list');
     link.click();
     URL.revokeObjectURL(blobUrl);
   } catch (e) {
