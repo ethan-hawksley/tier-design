@@ -36,6 +36,9 @@ export default function createTierRow(
         ...tier,
         items: tier.items.filter((item) => item.id !== tierItem.id),
       };
+      if ('src' in tierItem) {
+        URL.revokeObjectURL(tierItem.src);
+      }
       onUpdate(updatedTier);
     });
     rankedItemsRow.append(draggableItem);

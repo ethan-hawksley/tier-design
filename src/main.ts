@@ -37,7 +37,6 @@ const imagesInput = $('#images-input') as HTMLInputElement;
 const addTierButton = $('#add-tier-button');
 
 function render() {
-  console.log('Rendering Tier List');
   tierListTitle.textContent = state.title;
 
   const tierRowsFrag = document.createDocumentFragment();
@@ -50,7 +49,11 @@ function render() {
         render();
       },
       () => {
-        console.log('removing');
+        for (const item of tier.items) {
+          if ('src' in item) {
+            URL.revokeObjectURL(item.src);
+          }
+        }
         state.tiers = removeAtPosition(state.tiers, i);
         render();
       }
