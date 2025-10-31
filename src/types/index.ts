@@ -10,8 +10,6 @@ export interface ImageItem {
   id: number;
   type: 'image';
   src: string;
-  width: number;
-  height: number;
 }
 
 export type TierItem = TextItem | ImageItem;

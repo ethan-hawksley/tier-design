@@ -29,6 +29,7 @@ const tierListContainer = $('#tier-list-container');
 const unrankedItemsContainer = $('#unranked-items-container');
 const addTextButton = $('#add-text-button');
 const addImagesButton = $('#add-images-button');
+const imagesInput = $('#images-input') as HTMLInputElement;
 const addTierButton = $('#add-tier-button');
 
 function render() {
@@ -223,18 +224,22 @@ addTextButton.addEventListener('click', () => {
   }
 });
 
-// TODO: Implement image uploading
 addImagesButton.addEventListener('click', () => {
-  const text = prompt('Enter text:');
-  if (text) {
-    const newItem: TierItem = {
+  imagesInput.click();
+});
+
+imagesInput.addEventListener('change', () => {
+  if (!imagesInput.files) return;
+
+  for (const file of imagesInput.files) {
+    const tierItem: TierItem = {
       id: getNextItemId(),
-      type: 'text',
-      text: text,
+      type: 'image',
+      src: URL.createObjectURL(file),
     };
-    state.unrankedItems = [...state.unrankedItems, newItem];
-    render();
+    state.unrankedItems = [...state.unrankedItems, tierItem];
   }
+  render();
 });
 
 function getNextTierId() {

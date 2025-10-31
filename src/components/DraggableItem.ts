@@ -10,6 +10,10 @@ export default function createDraggableItem(
   if ('text' in tierItem) {
     draggableItem.textContent = tierItem.text;
     draggableItem.classList.add('draggable-item-text');
+  } else if ('src' in tierItem) {
+    const itemImage = document.createElement('img');
+    itemImage.src = tierItem.src;
+    draggableItem.replaceChildren(itemImage);
   }
   draggableItem.dataset.id = tierItem.id.toString();
   draggableItem.addEventListener('dragstart', (e) => {
