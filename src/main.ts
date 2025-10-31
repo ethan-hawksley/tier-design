@@ -301,22 +301,30 @@ async function renderTierListToBlob() {
 }
 
 saveButton.addEventListener('click', async () => {
-  const blob = await renderTierListToBlob();
-  const blobUrl = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = blobUrl;
-  link.download = safeFileName(tierListTitle.textContent);
-  link.click();
-  URL.revokeObjectURL(blobUrl);
+  try {
+    const blob = await renderTierListToBlob();
+    const blobUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = safeFileName(tierListTitle.textContent);
+    link.click();
+    URL.revokeObjectURL(blobUrl);
+  } catch (e) {
+    console.error('Error saving tier list:', e);
+  }
 });
 
 copyButton.addEventListener('click', async () => {
-  const blob = await renderTierListToBlob();
-  await navigator.clipboard.write([
-    new ClipboardItem({
-      [blob.type]: blob,
-    }),
-  ]);
+  try {
+    const blob = await renderTierListToBlob();
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        [blob.type]: blob,
+      }),
+    ]);
+  } catch (e) {
+    console.error('Error copying tier list:', e);
+  }
 });
 
 tierListElement.addEventListener('contextmenu', (e) => {
