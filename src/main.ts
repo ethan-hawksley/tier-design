@@ -303,14 +303,14 @@ function safeFileName(name: string) {
   return name;
 }
 
-// Convert all `blob:` image srcs under `root` to data URLs, return a map for restoration.
+// Convert all `blob:` image sources under `root` to data URLs, return a map for restoration.
 async function convertBlobImagesToDataUrls(root: HTMLElement) {
-  const imgs = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
+  const images = Array.from(root.querySelectorAll('img')) as HTMLImageElement[];
   const originalMap = new Map<HTMLImageElement, string>();
 
   // Convert each blob: src to a data URL concurrently
   await Promise.all(
-    imgs.map(async (img) => {
+    images.map(async (img) => {
       const src = img.src;
       if (src.startsWith('blob:')) {
         originalMap.set(img, src);
@@ -332,8 +332,8 @@ async function convertBlobImagesToDataUrls(root: HTMLElement) {
   return originalMap;
 }
 
-// Restore original `blob:` srcs from the map
-function restoreImageSrcs(originalMap: Map<HTMLImageElement, string>) {
+// Restore original `blob:` sources from the map
+function restoreImagesSources(originalMap: Map<HTMLImageElement, string>) {
   for (const [img, src] of originalMap.entries()) {
     img.src = src;
   }
@@ -353,17 +353,13 @@ async function renderTierListToBlob() {
   try {
     const blob = await toBlob(tierListElement, {
       backgroundColor: backgroundColour,
-      cacheBust: true,
-      pixelRatio: 2,
-      width: tierListElement.scrollWidth,
-      height: tierListElement.scrollHeight,
     });
 
     if (!blob) throw new Error('Failed to render tier list as blob');
     return blob;
   } finally {
-    // Always restore the original `blob:` srcs for UI
-    restoreImageSrcs(originalMap);
+    // Always restore the original `blob:` sources for UI
+    restoreImagesSources(originalMap);
   }
 }
 
