@@ -1,27 +1,29 @@
 :root {
-    font-family: system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    'Noto Sans',
-    'Liberation Sans',
-    sans-serif,
-    'Apple Color Emoji',
-    'Segoe UI Emoji',
-    'Segoe UI Symbol',
-    'Noto Color Emoji';
-    background-color: #242222;
-    color: #fff;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  font-family: system-ui,
+  -apple-system,
+  'Segoe UI',
+  Roboto,
+  'Helvetica Neue',
+  Arial,
+  'Noto Sans',
+  'Liberation Sans',
+  sans-serif,
+  'Apple Color Emoji',
+  'Segoe UI Emoji',
+  'Segoe UI Symbol',
+  'Noto Color Emoji';
+  font-synthesis: none;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background-color: #242222;
+  color: #fff;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body,
@@ -38,103 +40,120 @@ figcaption,
 blockquote,
 dl,
 dd {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
+
+  display: block;
 }
 
 #app {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #app-title {
-    font-size: 4rem;
+  font-size: 4rem;
 }
 
 #tier-list {
-    background-color: #1a1a17;
-    width: 100%;
-    max-width: 1000px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  margin-bottom: 1rem;
+
+  background-color: #1a1a17;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
 }
 
 #tier-list-container {
-    width: 100%;
+  width: 100%;
 }
 
 #tier-list-title {
-    color: #fff;
-    max-width: 40rem;
-    text-align: center;
-    font-size: 3rem;
-    word-break: break-word;
-    background: none;
-    border: none;
+  font-size: 3rem;
+  color: #fff;
+  text-align: center;
+  word-break: break-word;
+  max-width: 40rem;
+
+  background: none;
+  border: none;
 }
 
 .tier-row {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    min-height: 4rem;
+  width: 100%;
+  min-height: 4rem;
+
+  display: flex;
+  flex-direction: row;
 }
 
 .tier-label {
-    width: 4rem;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  width: 4rem;
+
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .ranked-items-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    border: 1px solid black;
-    gap: 0;
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0;
+
+  border: 1px solid black;
 }
 
 .unranked-items-row {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 40rem;
-    min-height: 4rem;
-    background-color: #1a1a17;
+  width: 40rem;
+  min-height: 4rem;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  background-color: #1a1a17;
 }
 
 .draggable-item {
-    width: 4rem;
-    height: 4rem;
-    color: white;
-    background-color: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
+  width: 4rem;
+  height: 4rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  color: white;
+
+  background-color: #111;
+
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .tier-list-button {
-    color: #fff;
-    background-color: #1a1a17;
-    border: 3px solid #000000;
-    border-radius: 15vh;
-    font-size: 1.5rem;
+  font-size: 1.5rem;
+  color: #fff;
+
+  background-color: #1a1a17;
+  border: 3px solid #000000;
+  border-radius: 15vh;
 }
