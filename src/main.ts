@@ -12,6 +12,10 @@ function $(selector: string) {
   return element;
 }
 
+function addToArray<T>(arr: T[], item: T) {
+  return [...arr, item];
+}
+
 function insertAtPosition<T>(arr: T[], item: T, index: number): T[] {
   return [...arr.slice(0, index), item, ...arr.slice(index)];
 }
@@ -157,7 +161,7 @@ mainDropArea.addEventListener('drop', (e) => {
         );
       }
     } else {
-      updatedTargetTierItems = [...targetTier.items, tierItem];
+      updatedTargetTierItems = addToArray(targetTier.items, tierItem);
     }
     const updatedTargetTier = {
       ...targetTier,
@@ -191,7 +195,7 @@ mainDropArea.addEventListener('drop', (e) => {
         );
       }
     } else {
-      state.unrankedItems = [...state.unrankedItems, tierItem];
+      state.unrankedItems = addToArray(state.unrankedItems, tierItem);
     }
   }
 
@@ -219,7 +223,7 @@ addTextButton.addEventListener('click', () => {
       type: 'text',
       text: text,
     };
-    state.unrankedItems = [...state.unrankedItems, newItem];
+    state.unrankedItems = addToArray(state.unrankedItems, newItem);
     render();
   }
 });
@@ -237,7 +241,7 @@ imagesInput.addEventListener('change', () => {
       type: 'image',
       src: URL.createObjectURL(file),
     };
-    state.unrankedItems = [...state.unrankedItems, tierItem];
+    state.unrankedItems = addToArray(state.unrankedItems, tierItem);
   }
   render();
 });
@@ -261,8 +265,16 @@ addTierButton.addEventListener('click', () => {
     colour,
     items: [],
   };
-  state.tiers = [...state.tiers, newTier];
+  state.tiers = addToArray(state.tiers, newTier);
   render();
+});
+
+$('#tier-list').addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
+unrankedItemsContainer.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
 });
 
 render();
