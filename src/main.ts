@@ -238,10 +238,11 @@ addImagesButton.addEventListener('click', () => {
 });
 
 function getNextTierId() {
-  return state.tiers.reduce(
+  const maxId = state.tiers.reduce(
     (currentMax, tier) => Math.max(currentMax, tier.id),
     0
   );
+  return maxId + 1;
 }
 
 addTierButton.addEventListener('click', () => {

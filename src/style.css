@@ -54,19 +54,28 @@ img {
     align-items: center;
 }
 
+#app-title {
+    font-size: 4rem;
+}
+
 #tier-list {
     background-color: #1a1a17;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1000px;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 1rem;
+    align-items: center;
+}
+
+#tier-list-container {
+    width: 100%;
 }
 
 #tier-list-title {
     color: #fff;
-    width: 40rem;
+    max-width: 40rem;
     text-align: center;
     font-size: 3rem;
     word-break: break-word;
@@ -77,7 +86,7 @@ img {
 .tier-row {
     display: flex;
     flex-direction: row;
-    width: 40rem;
+    width: 100%;
     min-height: 4rem;
 }
 
@@ -90,13 +99,13 @@ img {
     text-align: center;
 }
 
-/* Check TierMaker for css */
-
 .ranked-items-row {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    width: 36rem;
+    width: 100%;
+    border: 1px solid black;
+    gap: 0;
 }
 
 .unranked-items-row {
@@ -112,6 +121,7 @@ img {
     width: 4rem;
     height: 4rem;
     color: white;
+    background-color: #111;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,10 +129,6 @@ img {
     cursor: grab;
     user-select: none;
     -webkit-user-select: none;
-}
-
-.draggable-item-text {
-    border: 2px solid #000;
 }
 
 .tier-list-button {
