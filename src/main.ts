@@ -222,6 +222,18 @@ function getNextItemId() {
   return Math.max(maxIdInTiers, maxIdInUnranked) + 1;
 }
 
+async function fileToDataUrl(file: File): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => {
+      reader.abort();
+      reject(new Error('Failed to read file as data URL'));
+    };
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(file);
+  });
+}
+
 addTextButton.addEventListener('click', () => {
   const text = prompt('Enter text:');
   if (text) {
@@ -239,17 +251,23 @@ addImagesButton.addEventListener('click', () => {
   imagesInput.click();
 });
 
-imagesInput.addEventListener('change', () => {
+imagesInput.addEventListener('change', async () => {
   if (!imagesInput.files) return;
 
   for (const file of imagesInput.files) {
-    const tierItem: TierItem = {
-      id: getNextItemId(),
-      type: 'image',
-      src: URL.createObjectURL(file),
-    };
-    state.unrankedItems = addToArray(state.unrankedItems, tierItem);
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      const tierItem: TierItem = {
+        id: getNextItemId(),
+        type: 'image',
+        src: dataUrl,
+      };
+      state.unrankedItems = addToArray(state.unrankedItems, tierItem);
+    } catch (e) {
+      console.error('Failed to load image file:', e);
+    }
   }
+  imagesInput.value = '';
   render();
 });
 
