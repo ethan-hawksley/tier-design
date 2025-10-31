@@ -1,3 +1,4 @@
+import { toBlob } from 'html-to-image';
 import { state } from './state.ts';
 import createTierRow from './components/TierRow.ts';
 import createUnrankedItemsRow from './components/UnrankedItemsRow.ts';
@@ -28,6 +29,9 @@ function removeAtPosition<T>(arr: T[], index: number): T[] {
   return [...arr.slice(0, index), ...arr.slice(index + 1)];
 }
 
+const tierListElement = $('#tier-list');
+const saveButton = $('#save-button');
+const copyButton = $('#copy-button');
 const tierListTitle = $('#tier-list-title');
 const tierListContainer = $('#tier-list-container');
 const unrankedItemsContainer = $('#unranked-items-container');
@@ -272,7 +276,50 @@ addTierButton.addEventListener('click', () => {
   render();
 });
 
-$('#tier-list').addEventListener('contextmenu', (e) => {
+function safeFileName(name: string) {
+  return name;
+}
+
+async function renderTierListToBlob() {
+  const isTitleFocused = document.activeElement === tierListTitle;
+  if (isTitleFocused) {
+    tierListTitle.blur();
+  }
+
+  const backgroundColour = getComputedStyle(tierListElement).backgroundColor;
+
+  const blob = await toBlob(tierListElement, {
+    backgroundColor: backgroundColour,
+    cacheBust: true,
+    pixelRatio: 2,
+    width: tierListElement.scrollWidth,
+    height: tierListElement.scrollHeight,
+  });
+
+  if (!blob) throw new Error('Failed to render tier list as blob');
+  return blob;
+}
+
+saveButton.addEventListener('click', async () => {
+  const blob = await renderTierListToBlob();
+  const blobUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = safeFileName(tierListTitle.textContent);
+  link.click();
+  URL.revokeObjectURL(blobUrl);
+});
+
+copyButton.addEventListener('click', async () => {
+  const blob = await renderTierListToBlob();
+  await navigator.clipboard.write([
+    new ClipboardItem({
+      [blob.type]: blob,
+    }),
+  ]);
+});
+
+tierListElement.addEventListener('contextmenu', (e) => {
   e.preventDefault();
 });
 
